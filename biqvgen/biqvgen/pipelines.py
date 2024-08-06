@@ -10,4 +10,8 @@ from itemadapter import ItemAdapter
 
 class BiqvgenPipeline:
     def process_item(self, item, spider):
+        # intro
+        #  .replace("\xa0", "").replace("\u3000", "")
+        item["intro"] = item["intro"].replace("\xa0", "").replace("\u3000", "")
+        print(item)
         return item

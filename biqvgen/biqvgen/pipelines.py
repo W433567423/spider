@@ -5,15 +5,27 @@
 
 
 # useful for handling different item types with a single interface
-from biqvgen.utils import conn, console
-from rich.progress import BarColumn, TimeRemainingColumn, MofNCompleteColumn
+from biqvgen.utils import conn, console, FrameProgress
+from rich.progress import Progress, BarColumn, TextColumn, MofNCompleteColumn
+import os
+
+progress = FrameProgress(
+    "[progress.description]{task.description}",
+    BarColumn(),
+    TextColumn("{task.completed}本"),
+    transient=True,
+)
 
 
 class BiqvgenPipeline:
     novel_list = []  # 小说列表
+    task_id = None
 
     #  处理item
     def process_item(self, item, spider):
+
+        if item.get("abnormal"):
+            return
         novel = {
             "novel_id": item["novel_id"],
             "novel_name": item["novel_name"],
@@ -26,13 +38,16 @@ class BiqvgenPipeline:
         }
         novel["intro"] = item["intro"].replace("\xa0", "").replace("\u3000", "")
         self.novel_list.append(novel)
-
+        # with progress:
+        progress.start()
+        progress.update(self.task_id, advance=1)
         # if len(self.novel_list) == 1000:
         #     self.bulk_insert_to_mysql(self.novel_list, spider)
         #     del self.novel_list[:]
 
     # 开启爬虫
     def open_spider(self, spider):
+        console.log("开始爬取")
         # 创建数据库
         global conn
         conn.ping(reconnect=True)
@@ -59,26 +74,30 @@ class BiqvgenPipeline:
         )
         conn.commit()
         cursor.close()
-        # console.log("数据库初始化成功")
-        pass
+        # 创建log文件夹
+        if not os.path.exists("log"):
+            os.makedirs("log")
+        with progress:
+            self.task_id = progress.add_task("正在爬取小说详情", start=False)
 
     # 关闭爬虫
     def close_spider(self, spider):
         # 保存到数据库
-        # self.bulk_insert_to_mysql(self.novel_list, spider)
-        console.log("🚀 ~ self.novel_list, spider:", len(self.novel_list))
-        console.log(self.novel_list[:1])
+        self.bulk_insert_to_mysql(self.novel_list, spider)
+        # console.log("🚀 ~ self.novel_list, spider:", len(self.novel_list))
+        # console.log(self.novel_list[:1])
         pass
 
     # 批量插入到数据库
     def bulk_insert_to_mysql(self, data, spider):
-        console.log("开始批量插入到数据库")
+        # console.log("开始批量插入到数据库")
         global conn
         conn.ping(reconnect=True)
         cursor = conn.cursor()  # 创建游标
-        cursor.executemany(
-            "INSERT INTO novels(novel_id, novel_name, novel_cover, novel_author, novel_category, write_status, updated_time, intro) VALUES(%(novel_id)s, %(novel_name)s, %(novel_cover)s, %(novel_author)s, %(novel_category)s, %(write_status)s, %(updated_time)s, %(intro)s);",
-            (data),
-        )
+        sql = """
+            INSERT INTO novels(novel_id,novel_name,novel_cover,novel_author,novel_category,write_status,updated_time,intro)
+            VALUES(%(novel_id)s,%(novel_name)s,%(novel_cover)s,%(novel_author)s,%(novel_category)s,%(write_status)s,%(updated_time)s,%(intro)s)
+            """
+        cursor.executemany(sql, data)
         conn.commit()
         cursor.close()

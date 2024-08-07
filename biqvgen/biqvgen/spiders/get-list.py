@@ -1,11 +1,12 @@
 import scrapy  # type: ignore
 from biqvgen.items import GetListItem
+from biqvgen.utils import console
 
 
 class GetListSpider(scrapy.Spider):
     name = "get-list"  # 爬虫名称
     allowed_domains = ["biqugen.net"]  # 允许的域名
-    page = 680  # 当前页数
+    page = 1  # 当前页数
     start_urls = ["https://m.biqugen.net/full/1.html"]  # 开始爬取的url
     base_url = "https://m.biqugen.net/full/{}.html"  # 下一页的url
 
@@ -16,7 +17,8 @@ class GetListSpider(scrapy.Spider):
             url = item.css("a::attr(href)").get()
             #  提取novel_id
             novel_id = int(url.split("book/")[-1].split("/")[0])
-            item = GetListItem(novel_id=novel_id)
+            novel_name = item.css("a::text").get()
+            item = GetListItem(novel_id=novel_id, novel_name=novel_name)
             yield scrapy.Request(url, callback=self.parse_detail, meta={"item": item})
         # 下一页
         next_page = "".join(response.css("table.page-book a::text").getall())
@@ -25,14 +27,19 @@ class GetListSpider(scrapy.Spider):
             next_url = self.base_url.format(self.page)
             yield scrapy.Request(url=next_url, callback=self.parse)
         else:
-            print("没有下一页了")
+            # print("没有下一页了")
             return
 
     def parse_detail(self, response):
         item = response.meta["item"]
         # 提取信息
+        info = response.css("td.info")
+        if not info:
+            # 写入异常信息
+            self.logger.error(f"{item["novel_name"]} 访问失败,{response.url}")
+            item["abnormal"] = True
+            return
         item["novel_cover"] = response.css("div.bookinfo img::attr(src)").get()
-        item["novel_name"] = response.css("td.info h1::text").get()
         item["novel_author"] = response.css("td.info p")[0].css("a::text").get()
         item["novel_category"] = response.css("td.info p")[1].css("a::text").get()
         item["write_status"] = (
@@ -41,5 +48,9 @@ class GetListSpider(scrapy.Spider):
         item["updated_time"] = (
             response.css("td.info p")[3].get().split("更新：")[-1].split("</p>")[0]
         )
-        item["intro"] = response.css("div.intro::text").get().strip()
+        item["intro"] = (
+            response.css("div.intro::text").get().strip()
+            if response.css("div.intro::text").get()
+            else ""
+        )
         return item

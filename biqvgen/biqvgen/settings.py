@@ -1,3 +1,5 @@
+import datetime
+
 # Scrapy settings for biqvgen project
 #
 # For simplicity, this file contains only settings considered important or
@@ -92,3 +94,8 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 LOG_LEVEL = "WARNING"  # 仅显示警告信息
+to_day = datetime.datetime.now()
+log_file_path = "log/scrapy_{}_{}_{} {}_{}.log".format(
+    to_day.year, to_day.month, to_day.day, to_day.hour, to_day.minute
+)
+LOG_FILE = log_file_path

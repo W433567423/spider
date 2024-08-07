@@ -51,6 +51,7 @@ class BiqvgenPipeline:
         if len(self.novel_list) == 1000:
             # 保存到数据库
             bulk_insert_to_mysql(
+                self.logger.error,
                 self.remote_list,
                 self.novel_list,
                 self.abnormal_ids,
@@ -74,6 +75,7 @@ class BiqvgenPipeline:
 
         # 保存到数据库
         bulk_insert_to_mysql(
+            self.logger.error,
             self.remote_list,
             self.novel_list,
             self.abnormal_ids,

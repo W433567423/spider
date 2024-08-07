@@ -2,7 +2,7 @@ from biqvgen.utils import conn, console
 
 
 # 批量插入到数据库
-def bulk_insert_to_mysql(remote_list, novel_list, abnormal_ids):
+def bulk_insert_to_mysql(error, remote_list, novel_list, abnormal_ids):
     new_list = []
     for item in novel_list:
         if item["novel_id"] not in remote_list:
@@ -22,8 +22,8 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_ids):
             # insert前去重
             cursor.executemany(sql, new_list)
         except Exception as e:
-            console.error(f"批量插入失败:{e}")
-        console.log(f"更新异常列表:{len(abnormal_ids)}")
+            error(f"批量插入失败:{e}")
+        # error(f"更新异常列表:{len(abnormal_ids)}")
         for novel_id in abnormal_ids:
             cursor.execute(
                 f"UPDATE novels SET abnormal = TRUE WHERE novel_id = {novel_id}"

@@ -1,6 +1,5 @@
 import scrapy  # type: ignore
 from biqvgen.items import GetListItem
-from biqvgen.utils import console
 
 
 class GetListSpider(scrapy.Spider):

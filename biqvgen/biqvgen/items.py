@@ -2,11 +2,11 @@ import scrapy  # type: ignore
 
 
 class GetListItem(scrapy.Item):
-    book_id = scrapy.Field()  #  小说id
-    book_cover = scrapy.Field()  # 封面
-    book_name = scrapy.Field()  #  小说名
-    book_author = scrapy.Field()  # 作者
-    book_category = scrapy.Field()  # 分类
+    novel_id = scrapy.Field()  #  小说id
+    novel_cover = scrapy.Field()  # 封面
+    novel_name = scrapy.Field()  #  小说名
+    novel_author = scrapy.Field()  # 作者
+    novel_category = scrapy.Field()  # 分类
     write_status = scrapy.Field()  # 连载状态
     updated_time = scrapy.Field()  # 更新时间
     intro = scrapy.Field()  # 简介

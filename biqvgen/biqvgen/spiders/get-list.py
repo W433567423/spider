@@ -6,7 +6,7 @@ from biqvgen.utils import console
 class GetListSpider(scrapy.Spider):
     name = "get-list"  # 爬虫名称
     allowed_domains = ["biqugen.net"]  # 允许的域名
-    page = 1  # 当前页数
+    page = 1 # 当前页数
     start_urls = ["https://m.biqugen.net/full/1.html"]  # 开始爬取的url
     base_url = "https://m.biqugen.net/full/{}.html"  # 下一页的url
 

@@ -5,7 +5,7 @@ from biqvgen.items import GetListItem
 class GetListSpider(scrapy.Spider):
     name = "get-list"  # 爬虫名称
     allowed_domains = ["biqugen.net"]  # 允许的域名
-    page = 1 # 当前页数
+    page = 1  # 当前页数
     start_urls = ["https://m.biqugen.net/full/1.html"]  # 开始爬取的url
     base_url = "https://m.biqugen.net/full/{}.html"  # 下一页的url
 
@@ -35,14 +35,13 @@ class GetListSpider(scrapy.Spider):
         info = response.css("td.info")
         if not info:
             # 写入异常信息
-            self.logger.error(f"{item["novel_name"]} 访问失败,{response.url}")
             item["abnormal"] = True
             return
         item["novel_cover"] = response.css("div.bookinfo img::attr(src)").get()
         item["novel_author"] = response.css("td.info p")[0].css("a::text").get()
         item["novel_category"] = response.css("td.info p")[1].css("a::text").get()
         item["write_status"] = (
-            response.css("td.info p")[2].get().split("<p>")[-1].split("</p>")[0]
+            response.css("td.info p")[2].get().split("状态：")[-1].split("</p>")[0]
         )
         item["updated_time"] = (
             response.css("td.info p")[3].get().split("更新：")[-1].split("</p>")[0]

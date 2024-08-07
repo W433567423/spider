@@ -11,7 +11,6 @@ class GetListItem(scrapy.Item):
     updated_time = scrapy.Field()  # 更新时间
     intro = scrapy.Field()  # 简介
 
-    is_extra = scrapy.Field()  # 是否获取额外信息
     is_chapter = scrapy.Field()  # 是否获取章节信息
     abnormal = scrapy.Field()  # 是否异常信息
     file_path = scrapy.Field()  # 文件路径

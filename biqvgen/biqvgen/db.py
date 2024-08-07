@@ -1,8 +1,11 @@
 from biqvgen.utils import conn, console
 
+import logging
+
 
 # 批量插入到数据库
-def bulk_insert_to_mysql(error, remote_list, novel_list, abnormal_ids):
+def bulk_insert_to_mysql(remote_list, novel_list, abnormal_ids):
+    logging.warning(f"爬取结束,开始保存到数据库:{len(novel_list)}")
     new_list = []
     for item in novel_list:
         if item["novel_id"] not in remote_list:
@@ -22,12 +25,14 @@ def bulk_insert_to_mysql(error, remote_list, novel_list, abnormal_ids):
             # insert前去重
             cursor.executemany(sql, new_list)
         except Exception as e:
-            error(f"批量插入失败:{e}")
-        # error(f"更新异常列表:{len(abnormal_ids)}")
+            logging.error(f"批量插入失败:{e}")
+            pass
+        # logging.error(f"更新异常列表:{len(abnormal_ids)}")
         for novel_id in abnormal_ids:
             cursor.execute(
                 f"UPDATE novels SET abnormal = TRUE WHERE novel_id = {novel_id}"
             )
+        logging.warning("保存到数据库成功")
         conn.commit()
         cursor.close()
 
@@ -63,7 +68,6 @@ def reset_novels_table():
             write_status VARCHAR(255) COMMENT '小说连载状态',
             updated_time VARCHAR(255) COMMENT '小说发布时间',
             intro TEXT COMMENT '小说简介',
-            is_extra BOOLEAN DEFAULT FALSE COMMENT '是否已添加额外信息(连载情况、人气、评分等)',
             is_chapter BOOLEAN DEFAULT FALSE COMMENT '是否已添加章节信息',
             abnormal BOOLEAN DEFAULT FALSE COMMENT '是否异常',
             file_path VARCHAR(255) COMMENT '小说文件路径'

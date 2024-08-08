@@ -1,5 +1,4 @@
 from biqvgen.utils import conn, console
-
 import logging
 
 
@@ -13,22 +12,44 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_list):
         logging.warning("没有新数据")
         return
     else:
-
         logging.warning(f"爬取结束,开始保存到数据库:{len(new_list)}")
         global conn
         conn.ping(reconnect=True)
         cursor = conn.cursor()  # 创建游标
-        sql = """
-                INSERT INTO novels(novel_id,novel_name,novel_cover,novel_author,novel_category,write_status,updated_time,intro)
-                VALUES(%(novel_id)s,%(novel_name)s,%(novel_cover)s,%(novel_author)s,%(novel_category)s,%(write_status)s,%(updated_time)s,%(intro)s)
-                """
-        try:
-            # insert前去重
-            cursor.executemany(sql, new_list)
-        except Exception as e:
-            logging.error(f"批量插入失败:{e}")
-            pass
-        # logging.error(f"更新异常列表:{len(abnormal_ids)}")
+        sql = "INSERT INTO novels(novel_id,novel_name,novel_cover,novel_author,novel_category,write_status,updated_time,intro) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"
+        cursor.executemany(
+            sql,
+            [
+                (
+                    item["novel_id"],
+                    item["novel_name"],
+                    item["novel_cover"],
+                    item["novel_author"],
+                    item["novel_category"],
+                    item["write_status"],
+                    item["updated_time"],
+                    item["intro"],
+                )
+                for item in new_list
+            ],
+        )
+        #     for item in new_list:
+        #         try:
+        #             cursor.execute(
+        #                 f"""
+        #                     INSERT INTO novels(novel_id,novel_name,novel_cover,novel_author,novel_category,write_status,updated_time,intro)
+        #                     VALUES({item["novel_id"]},{item["novel_name"]},{item["novel_cover"]},{item["novel_author"]},{item["novel_category"]},{item["write_status"]},{item["updated_time"]},{item["intro"]})
+        # """
+        #             )
+        #         except Exception as e:
+        #             logging.error(f"批量插入失败:{e}")
+        #             logging.error(
+        #                 f"""
+        #                     INSERT INTO novels(novel_id,novel_name,novel_cover,novel_author,novel_category,write_status,updated_time,intro)
+        #                     VALUES({item["novel_id"]},{item["novel_name"]},{item["novel_cover"]},{item["novel_author"]},{item["novel_category"]},{item["write_status"]},{item["updated_time"]},{item["intro"]})
+        # """
+        #             )
+        logging.error(f"更新异常列表:{len(abnormal_list)}")
         for item in abnormal_list:
             cursor.execute(
                 "INSERT INTO novels(novel_id,novel_name,abnormal) VALUES(%s,%s,%s)",
@@ -68,11 +89,10 @@ def reset_novels_table():
             novel_author VARCHAR(255) COMMENT '小说作者',
             novel_category VARCHAR(255) COMMENT '小说分类',
             write_status VARCHAR(255) COMMENT '小说连载状态',
-            updated_time VARCHAR(255) COMMENT '小说发布时间',
+            updated_time VARCHAR(255) COMMENT '小说更新时间',
             intro TEXT COMMENT '小说简介',
-            is_chapter BOOLEAN DEFAULT FALSE COMMENT '是否已添加章节信息',
             abnormal BOOLEAN DEFAULT FALSE COMMENT '是否异常',
-            file_path VARCHAR(255) COMMENT '小说文件路径'
+            content LONGTEXT COMMENT '小说内容'
             );
         """
     )

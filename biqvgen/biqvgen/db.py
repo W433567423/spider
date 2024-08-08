@@ -12,7 +12,7 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_list):
         logging.warning("没有新数据")
         return
     else:
-        logging.warning(f"爬取结束,开始保存到数据库:{len(new_list)}")
+        # logging.warning(f"爬取结束,开始保存到数据库:{len(new_list)}")
         global conn
         conn.ping(reconnect=True)
         cursor = conn.cursor()  # 创建游标
@@ -49,11 +49,11 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_list):
         #                     VALUES({item["novel_id"]},{item["novel_name"]},{item["novel_cover"]},{item["novel_author"]},{item["novel_category"]},{item["write_status"]},{item["updated_time"]},{item["intro"]})
         # """
         #             )
-        logging.error(f"更新异常列表:{len(abnormal_list)}")
-        for item in abnormal_list:
-            cursor.execute(
-                "INSERT INTO novels(novel_id,novel_name,abnormal) VALUES(%s,%s,%s)",
-                (item["novel_id"], item["novel_name"], True),
+        if len(abnormal_list) != 0:
+            # logging.warning(f"更新异常列表:{len(abnormal_list)}")
+            cursor.executemany(
+                "UPDATE novels SET abnormal = TRUE WHERE novel_id = %s",
+                [(item,) for item in abnormal_list],
             )
         logging.warning("保存到数据库成功")
         conn.commit()

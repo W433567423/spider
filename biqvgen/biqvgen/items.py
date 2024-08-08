@@ -10,7 +10,14 @@ class GetListItem(scrapy.Item):
     write_status = scrapy.Field()  # 连载状态
     updated_time = scrapy.Field()  # 更新时间
     intro = scrapy.Field()  # 简介
-    chapter_list = scrapy.Field()  # 章节列表
 
     abnormal = scrapy.Field()  # 是否异常
     content = scrapy.Field()  # 内容
+
+
+class GetChapterItem(scrapy.Item):
+    novel_id = scrapy.Field()  # 小说id
+    chapter_id = scrapy.Field()  # 章节id
+    chapter_name = scrapy.Field()  # 章节名
+    chapter_content = scrapy.Field()  # 章节内容
+    abnormal = scrapy.Field()  # 是否异常

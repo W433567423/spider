@@ -37,17 +37,7 @@ class BiqvgenPipeline:
             progress.start()
             progress.update(self.task_id, advance=1)
         # 清洗数据
-        for key in item:
-            if key == "novel_id":
-                continue
-            item[key] = "".join(
-                [
-                    i
-                    for i in item[key]
-                    if i.isalnum() or i in ["。", "！", "，", "？", "："]
-                ]
-            )
-
+        item["intro"] = item["intro"].replace("\xa0", "")
         if item.get("abnormal"):
             self.abnormal_list.append(item)
             return

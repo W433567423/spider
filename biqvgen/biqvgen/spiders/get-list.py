@@ -5,7 +5,7 @@ from biqvgen.utils import console
 
 
 class GetListSpider(scrapy.Spider):
-    name = "index"  # 爬虫名称
+    name = "get-list"  # 爬虫名称
     allowed_domains = ["biqugen.net"]  # 允许的域名
     page =1 # 当前页数
     start_urls = ["https://m.biqugen.net/full/1.html"]  # 开始爬取的url
@@ -49,7 +49,7 @@ class GetListSpider(scrapy.Spider):
         if not info:
             # 写入异常信息
             item["abnormal"] = True
-            logging.warning(f"{item["novel_name"]} 异常:{response.url}")
+            logging.error(f"{item["novel_name"]} 异常:{response.url}")
             return
         item["novel_cover"] = response.css("div.bookinfo img::attr(src)").get()
         item["novel_author"] = response.css("td.info p")[0].css("a::text").get()

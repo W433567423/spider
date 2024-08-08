@@ -4,16 +4,17 @@ import logging
 
 
 # 批量插入到数据库
-def bulk_insert_to_mysql(remote_list, novel_list, abnormal_ids):
-    logging.warning(f"爬取结束,开始保存到数据库:{len(novel_list)}")
+def bulk_insert_to_mysql(remote_list, novel_list, abnormal_list):
     new_list = []
     for item in novel_list:
         if item["novel_id"] not in remote_list:
             new_list.append(item)
-    if len(new_list) == 0 and len(abnormal_ids) == 0:
-        console.log("没有新数据")
+    if len(new_list) == 0 and len(abnormal_list) == 0:
+        logging.warning("没有新数据")
         return
     else:
+
+        logging.warning(f"爬取结束,开始保存到数据库:{len(new_list)}")
         global conn
         conn.ping(reconnect=True)
         cursor = conn.cursor()  # 创建游标
@@ -28,9 +29,10 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_ids):
             logging.error(f"批量插入失败:{e}")
             pass
         # logging.error(f"更新异常列表:{len(abnormal_ids)}")
-        for novel_id in abnormal_ids:
+        for item in abnormal_list:
             cursor.execute(
-                f"UPDATE novels SET abnormal = TRUE WHERE novel_id = {novel_id}"
+                "INSERT INTO novels(novel_id,novel_name,abnormal) VALUES(%s,%s,%s)",
+                (item["novel_id"], item["novel_name"], True),
             )
         logging.warning("保存到数据库成功")
         conn.commit()

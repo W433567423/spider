@@ -23,7 +23,7 @@ progress = FrameProgress(
 
 class BiqvgenPipeline:
     novel_list = []  # 小说列表
-    abnormal_ids = []  # 异常id
+    abnormal_list = []  # 异常id
     remote_list = []
 
     task_id = None
@@ -37,7 +37,7 @@ class BiqvgenPipeline:
             progress.start()
             progress.update(self.task_id, advance=1)
         if item.get("abnormal"):
-            self.abnormal_ids.append(item["novel_id"])
+            self.abnormal_list.append(item)
             return
         novel = {
             "novel_id": item["novel_id"],
@@ -49,9 +49,6 @@ class BiqvgenPipeline:
             "updated_time": item["updated_time"],
             "intro": item["intro"],
         }
-        # novel["info"]='（新书《狂妻拽上天：帝少，高调宠！》已发）“这辈子，你只能是我的！”第一帝少墨昕宸一句话，锁定了尹恩希一生。用尹恩希的话总结她的狼性老公，那就是腹黑！霸道！占有欲极强！“不许看别的男人！不许撩女人！不许被人欺负！”听着墨昕宸霸道独裁的话，尹恩希翻了个白眼，她功夫一流，谁找死地来欺负她？\xa0\xa0\xa0\xa0'
-        #   '直到后来尹恩希被“欺负”得四肢酸软，才忍不住爆粗，说好的高冷禁欲呢？欺负她最多的就是他好不好？！\xa0\xa0\xa0\xa0'
-        #   '［本文1v1，巨甜酥爽宠文！］'
 
         # 将novel["info"]合法化，取出乱七八糟的字符
         novel["intro"] = "".join(
@@ -68,7 +65,7 @@ class BiqvgenPipeline:
             bulk_insert_to_mysql(
                 self.remote_list,
                 self.novel_list,
-                self.abnormal_ids,
+                self.abnormal_list,
             )
             del self.novel_list[:]
             del self.novel_list[:]
@@ -87,7 +84,7 @@ class BiqvgenPipeline:
         bulk_insert_to_mysql(
             self.remote_list,
             self.novel_list,
-            self.abnormal_ids,
+            self.abnormal_list,
         )
         console.log("爬取结束")
 

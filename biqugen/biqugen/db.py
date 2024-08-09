@@ -88,7 +88,7 @@ def get_chapter_id_list_from_db(novel_id):
 
 # 获取没有爬取章节的小说id列表
 def get_not_crawled_novel_id_list(limit=0):
-    sql = "SELECT novel_id FROM novels WHERE is_chapter = FALSE AND abnormal = FALSE"
+    sql = "SELECT novel_id FROM novels WHERE is_chapter = FALSE AND abnormal = FALSE ORDER BY novel_id ASC"
     if limit != 0:
         sql += f" LIMIT {limit}"
     novel_id_list = []
@@ -151,7 +151,7 @@ def bulk_insert_chapters_to_mysql(chapter_list):
         global conn
         conn.ping(reconnect=True)
         cursor = conn.cursor()  # 创建游标
-        sql = "INSERT INTO chapters(chapter_id,novel_id,novel_name,chapter_name,chapter_order,chapter_content) VALUES(%s,%s,%s,%s,%s)"
+        sql = "INSERT INTO chapters(chapter_id,novel_id,novel_name,chapter_name,chapter_order,chapter_content) VALUES(%s,%s,%s,%s,%s,%s)"
         cursor.executemany(
             sql,
             [

@@ -15,7 +15,18 @@ conn = pymysql.connect(
     charset="utf8",
 )
 
-novel_num = 0
+
+def get_not_crawled_novel_Count():
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT COUNT(novel_id) FROM novels WHERE is_chapter = FALSE AND abnormal = FALSE"
+    )
+    novel_num = cursor.fetchone()[0]
+    cursor.close()
+    return novel_num
+
+
+novel_num = 36
 
 
 class FrameProgress(Progress):

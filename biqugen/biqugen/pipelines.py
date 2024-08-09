@@ -5,13 +5,14 @@
 
 
 # useful for handling different item types with a single interface
-from biqugen.utils import console, FrameProgress
+from biqugen.utils import console,gen_task_id, FrameProgress
 from biqugen.db import (
     bulk_insert_to_mysql,
     get_novel_id_list_from_db,
     bulk_insert_chapters_to_mysql,
 )
 from rich.progress import BarColumn, TextColumn
+import logging
 
 list_progress = FrameProgress(
     "[progress.description]{task.description}",
@@ -75,9 +76,7 @@ class GetListPipeline:
 
 
 class GetChapterPipeline:
-    chapter_list = []  # 章节列表
-    novel_id = None
-    task_id = None
+    chapter_tasks=[]
 
     chapter_progress = FrameProgress(
         "[progress.description]{task.description}",
@@ -88,27 +87,25 @@ class GetChapterPipeline:
 
     #  处理item
     def process_item(self, item, spider):
-        if self.novel_id is None:
+        # 从task列表中寻找是否有该任务
+        index=-1
+        for i,task in enumerate(self.chapter_tasks):
+            if task["novel_id"]==item["novel_id"]:
+                index=i
+                break
+        if index==-1:
             self.chapter_progress.start()
-            self.task_id = self.chapter_progress.add_task(
+            task_id= self.chapter_progress.add_task(
                 f"爬取小说《{item["novel_name"]}》", start=False, completed=1
             )
-            self.novel_id = item["novel_id"]
-        elif self.novel_id != item["novel_id"]:
-            self.chapter_progress.stop()
-            # 保存到数据库
-            bulk_insert_chapters_to_mysql(self.chapter_list, self.novel_id)
-            console.log(f"开始存储小说{self.novel_id}章节数据:{len(self.chapter_list)}")
-            self.novel_id = item["novel_id"]
-            self.chapter_list.clear()
-            self.chapter_progress.start()
-            self.task_id = self.chapter_progress.add_task(
-                f"爬取小说《{item["novel_name"]}》", start=False, completed=1
-            )
+            task={"novel_id":item["novel_id"],"task_id":task_id,"chapter_list":[item]}
+            self.chapter_tasks.append(task)
         else:
-            self.chapter_progress.update(self.task_id, advance=1)
-        item["chapter_content"] = item["chapter_content"].replace("\xa0", "")
-        self.chapter_list.append(item)
+            # 取出task_id
+            task_id=self.chapter_tasks[index]["task_id"]
+            self.chapter_progress.update(task_id, advance=1)
+            self.chapter_tasks[index]["chapter_list"].append(item)
+
 
     # 开启爬虫
     def open_spider(self, spider):
@@ -118,7 +115,8 @@ class GetChapterPipeline:
     # 关闭爬虫
     def close_spider(self, spider):
         self.chapter_progress.stop()
-        console.log(f"爬取结束,开始存储剩余数据{len(self.chapter_list)}")
-        bulk_insert_chapters_to_mysql(self.chapter_list, self.novel_id)
+        # 保存到数据库
+        for task in self.chapter_tasks:
+            bulk_insert_chapters_to_mysql(task["chapter_list"])
         console.log("存储结束")
         pass

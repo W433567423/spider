@@ -41,7 +41,11 @@ class GetChapterSpider(scrapy.Spider):
             yield scrapy.Request(
                 url,
                 callback=self.parse_chapter,
-                meta={"novel_id": novel_id, "novel_name": novel_name},
+                meta={
+                    "novel_id": novel_id,
+                    "novel_name": novel_name,
+                    "mulu_page": mulu_page,
+                },
                 dont_filter=True,
             )
 
@@ -49,17 +53,22 @@ class GetChapterSpider(scrapy.Spider):
     def parse_chapter(self, response):
         novel_id = response.meta["novel_id"]
         novel_name = response.meta["novel_name"]
+        mulu_page = response.meta["mulu_page"]
         last9 = response.css("ul.last9").getall()
-        chapter_node_list = scrapy.Selector(text=last9.pop()).css("li a").getall()
+        chapter_node_list = scrapy.Selector(text=last9.pop()).css("li").getall()
+        i = 1
         for chapter in chapter_node_list:
-            chapter_id = re.search(r'href="(.*?).html"', chapter).group(1)
-            chapter_name = re.search(r">(.*?)</a>", chapter).group(1)
+            chapter_id = chapter.split('href="')[-1].split(".html")[0]
+            chapter_name = chapter.split('.html">')[-1].split("</a>")[0]
+
             item = GetChapterItem(
                 novel_id=novel_id,
                 chapter_id=chapter_id,
                 chapter_name=chapter_name,
                 novel_name=novel_name,
+                chapter_order=mulu_page * (i - 1) + i,
             )
+            i += 1
             url = f"{self.base_url}/book/{novel_id}/{chapter_id}.html"
             yield scrapy.Request(
                 url,
@@ -67,12 +76,6 @@ class GetChapterSpider(scrapy.Spider):
                 meta={"item": item},
                 dont_filter=True,
             )
-        # if is_last:
-        # yield item
-        # console.log("🚀 ~ chapter_url:", chapter_url)
-        # console.log("🚀 ~ chapter_name:", chapter_name)
-        # yield scrapy.Request(chapter_url, callback=self.parse_content, meta={"item": item})
-        # item["content"] = content
 
     # 获取小说内容
     def parse_content(self, response):

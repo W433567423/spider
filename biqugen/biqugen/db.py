@@ -42,8 +42,14 @@ def reset_chapters_table():
             novel_id INT COMMENT '小说id',
             novel_name VARCHAR(255) COMMENT '小说名',
             chapter_name VARCHAR(255) COMMENT '章节名',
+            chapter_order INT COMMENT '章节顺序',
             chapter_content LONGTEXT COMMENT '章节内容'
             );
+        """
+    )
+    cursor.execute(
+        """
+            UPDATE novels SET is_chapter = FALSE;
         """
     )
     conn.commit()
@@ -136,7 +142,10 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_list):
 
 
 # 批量插入章节到数据库
-def bulk_insert_chapters_to_mysql(chapter_list, novel_id: int):
+def bulk_insert_chapters_to_mysql(chapter_list):
+    console.log(
+        f"爬取结束,开始存储《{chapter_list[0]["novel_name"]}》章节：{len(chapter_list)}"
+    )
     if len(chapter_list) == 0:
         logging.warning("没有新数据")
         return
@@ -161,7 +170,7 @@ def bulk_insert_chapters_to_mysql(chapter_list, novel_id: int):
         console.log("开始更新novels表is_chapter字段")
         cursor.execute(
             "UPDATE novels SET is_chapter = TRUE WHERE novel_id = %s",
-            novel_id,
+            chapter_list[0]["novel_id"],
         )
         conn.commit()
         cursor.close()

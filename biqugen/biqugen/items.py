@@ -21,3 +21,6 @@ class GetChapterItem(scrapy.Item):
     chapter_id = scrapy.Field()  # 章节id
     chapter_name = scrapy.Field()  # 章节名
     chapter_content = scrapy.Field()  # 章节内容
+    chapter_order = scrapy.Field()  # 章节顺序
+
+    task_id = scrapy.Field()  # 任务id

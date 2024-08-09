@@ -91,6 +91,7 @@ def reset_novels_table():
             write_status VARCHAR(255) COMMENT '小说连载状态',
             updated_time VARCHAR(255) COMMENT '小说更新时间',
             intro TEXT COMMENT '小说简介',
+            is_chapter BOOLEAN DEFAULT FALSE COMMENT '是否已爬取章节',
             abnormal BOOLEAN DEFAULT FALSE COMMENT '是否异常',
             content LONGTEXT COMMENT '小说内容'
             );

@@ -32,6 +32,7 @@ class BiqvgenPipeline:
     def process_item(self, item, spider):
         if self.task_id is None:
             progress.start()
+            progress.update(self.task_id, advance=1)
             self.task_id = progress.add_task("正在爬取小说详情", start=False)
         else:
             progress.start()

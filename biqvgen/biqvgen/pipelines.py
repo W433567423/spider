@@ -59,8 +59,6 @@ class BiqvgenPipeline:
 
     # 关闭爬虫
     def close_spider(self, spider):
-        progress.start()
-        progress.update(self.task_id, completed=len(self.novel_list))
         progress.stop()
 
         # 保存到数据库
@@ -69,4 +67,7 @@ class BiqvgenPipeline:
             self.novel_list,
             self.abnormal_list,
         )
+        self.novel_list.clear()
+        self.abnormal_list.clear()
+
         console.log("爬取结束")

@@ -1,5 +1,29 @@
 import datetime
 
+BOT_NAME = "biqvgen"
+SPIDER_MODULES = ["biqvgen.spiders"]
+NEWSPIDER_MODULE = "biqvgen.spiders"
+ROBOTSTXT_OBEY = False  # 不遵守robots协议
+ITEM_PIPELINES = {
+    "biqvgen.pipelines.BiqvgenPipeline": 300,
+}
+REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
+TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+CONCURRENT_REQUESTS = 256
+CONCURRENT_REQUESTS_PER_DOMAIN = 16
+CONCURRENT_REQUESTS_PER_IP = 16
+
+# 日志设置
+FEED_EXPORT_ENCODING = "gbk"
+LOG_LEVEL = "WARNING"  # 仅显示警告信息
+to_day = datetime.datetime.now()
+# log_file_path = "log/scrapy_{}_{}_{} {}_{}.log".format(
+#     to_day.year, to_day.month, to_day.day, to_day.hour, to_day.minute
+# )
+log_file_path = "log/scrapy_{}_{}_{}.log".format(to_day.year, to_day.month, to_day.day)
+LOG_FILE = log_file_path
+
+
 # Scrapy settings for biqvgen project
 #
 # For simplicity, this file contains only settings considered important or
@@ -9,17 +33,11 @@ import datetime
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = "biqvgen"
-
-SPIDER_MODULES = ["biqvgen.spiders"]
-NEWSPIDER_MODULE = "biqvgen.spiders"
-
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = "biqvgen (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = False  # 不遵守robots协议
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -64,9 +82,6 @@ ROBOTSTXT_OBEY = False  # 不遵守robots协议
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-    "biqvgen.pipelines.BiqvgenPipeline": 300,
-}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -90,13 +105,3 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
 
 # Set settings whose default value is deprecated to a future-proof value
-REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
-TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
-FEED_EXPORT_ENCODING = "gbk"
-LOG_LEVEL = "WARNING"  # 仅显示警告信息
-to_day = datetime.datetime.now()
-# log_file_path = "log/scrapy_{}_{}_{} {}_{}.log".format(
-#     to_day.year, to_day.month, to_day.day, to_day.hour, to_day.minute
-# )
-log_file_path = "log/scrapy_{}_{}_{}.log".format(to_day.year, to_day.month, to_day.day)
-LOG_FILE = log_file_path

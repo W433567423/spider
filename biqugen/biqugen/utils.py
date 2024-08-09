@@ -15,7 +15,7 @@ conn = pymysql.connect(
     charset="utf8",
 )
 
-novel_num = 20
+novel_num = 0
 
 
 class FrameProgress(Progress):

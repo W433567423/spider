@@ -80,7 +80,7 @@ class GetChapterPipeline:
     chapter_progress = ChapterFrameProgress(
         "[progress.description]{task.description}",
         BarColumn(),
-        "[progress.percentage]{task.percentage:>3.1f}%",
+        "[progress.percentage]{task.percentage:>3.2f}%",
         TextColumn('{task.completed}/{task.total}'),
         "[cyan]⏳",
         TimeRemainingColumn()

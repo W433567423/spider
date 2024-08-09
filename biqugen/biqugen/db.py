@@ -151,7 +151,7 @@ def bulk_insert_chapters_to_mysql(chapter_list):
         global conn
         conn.ping(reconnect=True)
         cursor = conn.cursor()  # 创建游标
-        sql = "INSERT INTO chapters(chapter_id,novel_id,novel_name,chapter_name,chapter_content) VALUES(%s,%s,%s,%s,%s)"
+        sql = "INSERT INTO chapters(chapter_id,novel_id,novel_name,chapter_name,chapter_order,chapter_content) VALUES(%s,%s,%s,%s,%s)"
         cursor.executemany(
             sql,
             [
@@ -160,6 +160,7 @@ def bulk_insert_chapters_to_mysql(chapter_list):
                     item["novel_id"],
                     item["novel_name"],
                     item["chapter_name"],
+                    item["chapter_order"],
                     item["chapter_content"],
                 )
                 for item in chapter_list

@@ -8,6 +8,8 @@ def reset_novels_table():
     global conn
     conn.ping(reconnect=True)
     cursor = conn.cursor()
+    # 先尝试删除 chapters表
+    reset_chapters_table()
     # cursor.execute("CREATE DATABASE novel_database IF NOT EXISTS novel_database;")
     cursor.execute("DROP TABLE IF EXISTS novels;")
     cursor.execute(

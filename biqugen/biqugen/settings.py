@@ -20,5 +20,5 @@ to_day = datetime.datetime.now()
 # log_file_path = "log/scrapy_{}_{}_{} {}_{}.log".format(
 #     to_day.year, to_day.month, to_day.day, to_day.hour, to_day.minute
 # )
-log_file_path = "log/scrapy_{}_{}_{}.log".format(to_day.year, to_day.month, to_day.day)
+log_file_path = "log/chapter_{}_{}_{}.log".format(to_day.year, to_day.month, to_day.day)
 LOG_FILE = log_file_path

@@ -5,20 +5,15 @@
 
 
 # useful for handling different item types with a single interface
-from biqugen.utils import console,gen_task_id, FrameProgress
+from biqugen.utils import console, FrameProgress
 from biqugen.db import (
     bulk_insert_to_mysql,
     get_novel_id_list_from_db,
     bulk_insert_chapters_to_mysql,
 )
-from rich.progress import BarColumn, TextColumn
-import logging
+from rich.progress import BarColumn, TextColumn, MofNCompleteColumn, TimeRemainingColumn
 
-list_progress = FrameProgress(
-    "[progress.description]{task.description}",
-    BarColumn(),
-    TextColumn("{task.completed}本"),
-)
+
 
 
 class GetListPipeline:
@@ -27,17 +22,21 @@ class GetListPipeline:
     remote_list = []
 
     task_id = None
-
+    list_progress = FrameProgress(
+        "[progress.description]{task.description}",
+        BarColumn(),
+        TextColumn("{task.completed}本"),
+    )
     #  处理item
     def process_item(self, item, spider):
         if self.task_id is None:
-            list_progress.start()
-            self.task_id = list_progress.add_task(
+            self.list_progress.start()
+            self.task_id = self.list_progress.add_task(
                 "正在爬取小说详情", start=False, completed=1
             )
         else:
-            list_progress.start()
-            list_progress.update(self.task_id, advance=1)
+            self.list_progress.start()
+            self.list_progress.update(self.task_id, advance=1)
         # 清洗数据
         item["intro"] = item["intro"].replace("\xa0", "")
         if item.get("abnormal"):
@@ -61,7 +60,7 @@ class GetListPipeline:
 
     # 关闭爬虫
     def close_spider(self, spider):
-        list_progress.stop()
+        self.list_progress.stop()
 
         # 保存到数据库
         bulk_insert_to_mysql(
@@ -81,8 +80,11 @@ class GetChapterPipeline:
     chapter_progress = FrameProgress(
         "[progress.description]{task.description}",
         BarColumn(),
-        TextColumn("{task.completed}章"),
-    )   
+        "[progress.percentage]{task.percentage:>3.1f}%",
+        TextColumn('{task.fields[completed]}/{task.fields[total_chapter]}章'),
+        "[cyan]⏳",
+        TimeRemainingColumn()
+        )
 
 
     #  处理item
@@ -96,14 +98,14 @@ class GetChapterPipeline:
         if index==-1:
             self.chapter_progress.start()
             task_id= self.chapter_progress.add_task(
-                f"爬取小说《{item["novel_name"]}》", start=False, completed=1
+                f"爬取小说《{item["novel_name"]}》", completed=1
             )
             task={"novel_id":item["novel_id"],"task_id":task_id,"chapter_list":[item]}
             self.chapter_tasks.append(task)
         else:
             # 取出task_id
             task_id=self.chapter_tasks[index]["task_id"]
-            self.chapter_progress.update(task_id, advance=1)
+            self.chapter_progress.update(task_id, advance=1,total=item["total_chapter"])
             self.chapter_tasks[index]["chapter_list"].append(item)
 
 

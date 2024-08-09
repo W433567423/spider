@@ -24,3 +24,4 @@ class GetChapterItem(scrapy.Item):
     chapter_order = scrapy.Field()  # 章节顺序
 
     task_id = scrapy.Field()  # 任务id
+    total_chapter = scrapy.Field()  # 总章节数

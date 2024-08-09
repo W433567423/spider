@@ -25,7 +25,3 @@ class FrameProgress(Progress):
             style="black",
             safe_box=True,
         )
-
-
-def gen_task_id(novel_id: int):
-    return f"taskId_{novel_id}"

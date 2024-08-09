@@ -1,5 +1,6 @@
 from biqugen.utils import conn, console
 import logging
+import time
 
 
 #  reset novels表
@@ -143,9 +144,6 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_list):
 
 # 批量插入章节到数据库
 def bulk_insert_chapters_to_mysql(chapter_list):
-    print(
-        f"爬取结束,开始存储《{chapter_list[0]["novel_name"]}》章节：{len(chapter_list)}"
-    )
     if len(chapter_list) == 0:
         logging.warning("没有新数据")
         return
@@ -173,3 +171,8 @@ def bulk_insert_chapters_to_mysql(chapter_list):
         )
         conn.commit()
         cursor.close()
+        # 打印当前时间
+        now=(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        print(
+            f"{now}《{chapter_list[0]["novel_name"]}》存储成功,章节数量：{len(chapter_list)}"
+        )

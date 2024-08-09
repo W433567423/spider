@@ -25,3 +25,4 @@ class GetChapterItem(scrapy.Item):
 
     task_id = scrapy.Field()  # 任务id
     total_chapter = scrapy.Field()  # 总章节数
+    is_end = scrapy.Field()  # 是否最后一页

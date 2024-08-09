@@ -15,6 +15,8 @@ conn = pymysql.connect(
     charset="utf8",
 )
 
+novel_num = 20
+
 
 class FrameProgress(Progress):
     def get_renderables(self):

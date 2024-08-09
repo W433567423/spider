@@ -1,6 +1,6 @@
 import scrapy  # type: ignore
 from biqugen.db import get_not_crawled_novel_id_list
-from biqugen.utils import console
+from biqugen.utils import novel_num
 import logging, re
 from biqugen.items import GetChapterItem
 
@@ -10,7 +10,7 @@ class GetChapterSpider(scrapy.Spider):
     allowed_domains = ["m.biqugen.net"]
     base_url = "https://m.biqugen.net"
     start_urls = []
-    ids = get_not_crawled_novel_id_list(5)
+    ids = get_not_crawled_novel_id_list(novel_num)
     for id in ids:
         start_urls.append(f"https://m.biqugen.net/book/{id}")  # 开始爬取的url
 
@@ -62,7 +62,7 @@ class GetChapterSpider(scrapy.Spider):
         for chapter in chapter_node_list:
             chapter_id = chapter.split('href="')[-1].split(".html")[0]
             chapter_name = chapter.split('.html">')[-1].split("</a>")[0]
-            is_end = (mulu_page - 1) == index and len(chapter_node_list) == i
+            is_end = (mulu_page - 1) == index
             item = GetChapterItem(
                 novel_id=novel_id,
                 chapter_id=chapter_id,
@@ -70,10 +70,11 @@ class GetChapterSpider(scrapy.Spider):
                 novel_name=novel_name,
                 chapter_order=(index - 1) * 50 + i,
                 total_chapter=(
-                    (mulu_page - 1) * 50 + len(chapter_node_list)
+                    (mulu_page - 2) * 50 + len(chapter_node_list)
                     if is_end
-                    else mulu_page * 50
+                    else (mulu_page - 1) * 50
                 ),
+                is_end=is_end,
             )
             i += 1
             url = f"{self.base_url}/book/{novel_id}/{chapter_id}.html"

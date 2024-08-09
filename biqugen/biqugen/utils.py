@@ -25,3 +25,15 @@ class FrameProgress(Progress):
             style="black",
             safe_box=True,
         )
+
+
+class ChapterFrameProgress(Progress):
+    def get_renderables(self):
+        yield Panel(
+            self.make_tasks_table(self.tasks),
+            expand=True,
+            border_style="green",
+            style="black",
+            safe_box=True,
+            title="小说爬取进度(分布式)",
+        )

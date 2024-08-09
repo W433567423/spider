@@ -70,7 +70,9 @@ class GetChapterSpider(scrapy.Spider):
                 novel_name=novel_name,
                 chapter_order=(index - 1) * 50 + i,
                 total_chapter=(
-                    (mulu_page - 1) * 50 + len(chapter_node_list) if is_end else None
+                    (mulu_page - 1) * 50 + len(chapter_node_list)
+                    if is_end
+                    else mulu_page * 50
                 ),
             )
             i += 1

@@ -5,7 +5,7 @@
 
 
 # useful for handling different item types with a single interface
-from biqugen.utils import console, FrameProgress
+from biqugen.utils import console, FrameProgress,ChapterFrameProgress
 from biqugen.db import (
     bulk_insert_to_mysql,
     get_novel_id_list_from_db,
@@ -77,7 +77,7 @@ class GetListPipeline:
 class GetChapterPipeline:
     chapter_tasks=[]
 
-    chapter_progress = FrameProgress(
+    chapter_progress = ChapterFrameProgress(
         "[progress.description]{task.description}",
         BarColumn(),
         "[progress.percentage]{task.percentage:>3.1f}%",
@@ -100,10 +100,10 @@ class GetChapterPipeline:
             task_id= self.chapter_progress.add_task(
                 f"爬取小说《{item["novel_name"]}》", completed=1
             )
-            task={"novel_id":item["novel_id"],"task_id":task_id,"chapter_list":[item]}
+            task={"novel_id":item["novel_id"],"task_id":task_id,"chapter_list":[item],"total_chapter":item["total_chapter"]}
             self.chapter_tasks.append(task)
         else:
-            if(item["total_chapter"] is not None):
+            if self.chapter_tasks[index]["total_chapter"]!=item["total_chapter"]:
                 self.chapter_tasks[index]["total_chapter"]=item["total_chapter"]
             # 取出task_id
             task_id=self.chapter_tasks[index]["task_id"]
@@ -112,7 +112,7 @@ class GetChapterPipeline:
             if( len(self.chapter_tasks[index]["chapter_list"])==self.chapter_tasks[index]["total_chapter"]):
                 self.chapter_progress.stop_task(task_id)
                 # 保存到数据库
-                # self.chapter_progress.update(task_id,visible=False)
+                self.chapter_progress.update(task_id,completed=self.chapter_tasks[index]["total_chapter"])
                 bulk_insert_chapters_to_mysql(self.chapter_tasks[index]["chapter_list"])
                 self.chapter_tasks.pop(index)
 

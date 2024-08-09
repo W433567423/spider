@@ -62,14 +62,16 @@ class GetChapterSpider(scrapy.Spider):
         for chapter in chapter_node_list:
             chapter_id = chapter.split('href="')[-1].split(".html")[0]
             chapter_name = chapter.split('.html">')[-1].split("</a>")[0]
-
+            is_end = (mulu_page - 1) == index and len(chapter_node_list) == i
             item = GetChapterItem(
                 novel_id=novel_id,
                 chapter_id=chapter_id,
                 chapter_name=chapter_name,
                 novel_name=novel_name,
                 chapter_order=(index - 1) * 50 + i,
-                total_chapter=(mulu_page - 1) * 50 + len(chapter_node_list),
+                total_chapter=(
+                    (mulu_page - 1) * 50 + len(chapter_node_list) if is_end else None
+                ),
             )
             i += 1
             url = f"{self.base_url}/book/{novel_id}/{chapter_id}.html"

@@ -11,4 +11,4 @@ else:
 
 # 重置数据库
 # reset_novels_table()
-# reset_chapters_table()
+reset_chapters_table()

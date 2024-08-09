@@ -143,7 +143,7 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_list):
 
 # 批量插入章节到数据库
 def bulk_insert_chapters_to_mysql(chapter_list):
-    console.log(
+    print(
         f"爬取结束,开始存储《{chapter_list[0]["novel_name"]}》章节：{len(chapter_list)}"
     )
     if len(chapter_list) == 0:
@@ -167,7 +167,6 @@ def bulk_insert_chapters_to_mysql(chapter_list):
                 for item in chapter_list
             ],
         )
-        console.log("开始更新novels表is_chapter字段")
         cursor.execute(
             "UPDATE novels SET is_chapter = TRUE WHERE novel_id = %s",
             chapter_list[0]["novel_id"],

@@ -81,7 +81,7 @@ class GetChapterPipeline:
         "[progress.description]{task.description}",
         BarColumn(),
         "[progress.percentage]{task.percentage:>3.1f}%",
-        TextColumn('{task.fields[completed]}/{task.fields[total_chapter]}章'),
+        TextColumn('{task.completed}/{task.total}章'),
         "[cyan]⏳",
         TimeRemainingColumn()
         )
@@ -103,10 +103,18 @@ class GetChapterPipeline:
             task={"novel_id":item["novel_id"],"task_id":task_id,"chapter_list":[item]}
             self.chapter_tasks.append(task)
         else:
+            if(item["total_chapter"] is not None):
+                self.chapter_tasks[index]["total_chapter"]=item["total_chapter"]
             # 取出task_id
             task_id=self.chapter_tasks[index]["task_id"]
             self.chapter_progress.update(task_id, advance=1,total=item["total_chapter"])
             self.chapter_tasks[index]["chapter_list"].append(item)
+            if( len(self.chapter_tasks[index]["chapter_list"])==self.chapter_tasks[index]["total_chapter"]):
+                self.chapter_progress.stop_task(task_id)
+                # 保存到数据库
+                # self.chapter_progress.update(task_id,visible=False)
+                bulk_insert_chapters_to_mysql(self.chapter_tasks[index]["chapter_list"])
+                self.chapter_tasks.pop(index)
 
 
     # 开启爬虫

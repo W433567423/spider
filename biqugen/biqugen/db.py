@@ -8,6 +8,7 @@ def reset_novels_table():
     global conn
     conn.ping(reconnect=True)
     cursor = conn.cursor()
+    # cursor.execute("CREATE DATABASE novel_database IF NOT EXISTS novel_database;")
     cursor.execute("DROP TABLE IF EXISTS novels;")
     cursor.execute(
         """
@@ -21,7 +22,7 @@ def reset_novels_table():
             updated_time VARCHAR(255) COMMENT '小说更新时间',
             intro TEXT COMMENT '小说简介',
             is_chapter BOOLEAN DEFAULT FALSE COMMENT '是否已爬取章节',
-            abnormal BOOLEAN DEFAULT FALSE COMMENT '是否异常',
+            abnormal BOOLEAN DEFAULT FALSE COMMENT '是否异常'
             );
         """
     )

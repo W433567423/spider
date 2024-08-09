@@ -1,5 +1,5 @@
 import os
-from biqvgen.db import reset_novels_table
+from biqugen.db import reset_novels_table
 
 # 创建log文件夹
 if not os.path.exists("log"):

@@ -1,6 +1,6 @@
 import logging,re, scrapy  # type: ignore
-from biqvgen.items import GetListItem
-from biqvgen.utils import console
+from biqugen.items import GetListItem
+from biqugen.utils import console
 
 
 
@@ -39,8 +39,6 @@ class GetListSpider(scrapy.Spider):
             item = GetListItem(novel_id=novel_id, novel_name=novel_name)
             yield scrapy.Request(url, callback=self.parse_detail, meta={"item": item})
 
-
-
     # 获取小说详细信息
     def parse_detail(self, response):
         item = response.meta["item"]
@@ -68,47 +66,5 @@ class GetListSpider(scrapy.Spider):
         
         yield item
 
-        # item["chapter_list"] = []
-
-        # #  获取小说目录page
-        # mulu_node=response.css("div.lb_mulu div.input-group").get()
-        # if not mulu_node:
-        #     logging.warning(f"{item["novel_name"]} 仅一页目录:{response.url}")
-        #     return
-        # mulu_page=int(response.css("div.lb_mulu select.form-control option:last-child::text").get().split("第")[-1].split("页")[0])+1
-        # for i in range(1,mulu_page):
-        #     url = response.url+f"index_{i}.html"
-        #     yield scrapy.Request(url, callback=self.parse_chapter, meta={"item": item})
-        
-    # 获取小说章节
-    def parse_chapter(self, response):
-        item = response.meta["item"]
-        last9 = response.css("ul.last9").getall()
-        if len(last9) !=2:
-            logging.warning(f"{item["novel_name"]} 异常:{response.url}")
-            return
-        chapter_list=scrapy.Selector(text=last9.pop()).css("li a").getall()
-        for chapter in chapter_list:
-            chapter_id=re.search(r'href="(.*?).html"',chapter).group(1)
-            chapter_name=re.search(r'>(.*?)</a>',chapter).group(1)
-            chapter_title=chapter_name[chapter_name.index('.')+1:]
-            chapter_order=int(chapter_name.split(".")[0])
-            item["chapter_list"].append({
-                "chapter_id":chapter_id,
-                "chapter_title":chapter_title,
-                "chapter_order":chapter_order
-                })
-        # if is_last:
-        # yield item
-            # console.log("🚀 ~ chapter_url:", chapter_url)
-            # console.log("🚀 ~ chapter_name:", chapter_name)
-            # yield scrapy.Request(chapter_url, callback=self.parse_content, meta={"item": item})
-        # item["content"] = content
+     
     
-    # 获取小说内容
-    def parse_content(self, response):
-        item = response.meta["item"]
-        content = response.css("div#nr1::text").get()
-        console.log("🚀 ~ content:", content)
-        # item["content"] = content
-        # yield item

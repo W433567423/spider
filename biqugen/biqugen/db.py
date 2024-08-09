@@ -1,4 +1,4 @@
-from biqvgen.utils import conn, console
+from biqugen.utils import conn, console
 import logging
 
 
@@ -33,22 +33,6 @@ def bulk_insert_to_mysql(remote_list, novel_list, abnormal_list):
                 for item in new_list
             ],
         )
-        #     for item in new_list:
-        #         try:
-        #             cursor.execute(
-        #                 f"""
-        #                     INSERT INTO novels(novel_id,novel_name,novel_cover,novel_author,novel_category,write_status,updated_time,intro)
-        #                     VALUES({item["novel_id"]},{item["novel_name"]},{item["novel_cover"]},{item["novel_author"]},{item["novel_category"]},{item["write_status"]},{item["updated_time"]},{item["intro"]})
-        # """
-        #             )
-        #         except Exception as e:
-        #             logging.error(f"批量插入失败:{e}")
-        #             logging.error(
-        #                 f"""
-        #                     INSERT INTO novels(novel_id,novel_name,novel_cover,novel_author,novel_category,write_status,updated_time,intro)
-        #                     VALUES({item["novel_id"]},{item["novel_name"]},{item["novel_cover"]},{item["novel_author"]},{item["novel_category"]},{item["write_status"]},{item["updated_time"]},{item["intro"]})
-        # """
-        #             )
         if len(abnormal_list) != 0:
             # logging.warning(f"更新异常列表:{len(abnormal_list)}")
             cursor.executemany(
@@ -100,3 +84,17 @@ def reset_novels_table():
     conn.commit()
     cursor.close()
     console.log("novels表已重置")
+
+
+# 获取没有爬取章节的小说id列表
+def get_not_crawled_novel_id_list():
+    novel_id_list = []
+    global conn
+    conn.ping(reconnect=True)
+    cursor = conn.cursor()
+    cursor.execute("SELECT novel_id FROM novels WHERE is_chapter = FALSE LIMIT 10")
+    remote_list = cursor.fetchall()
+    for novel_id in remote_list:
+        novel_id_list.append(novel_id[0])
+    cursor.close()
+    return novel_id_list

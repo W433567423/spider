@@ -5,8 +5,8 @@
 
 
 # useful for handling different item types with a single interface
-from biqvgen.utils import console, FrameProgress
-from biqvgen.db import (
+from biqugen.utils import console, FrameProgress
+from biqugen.db import (
     bulk_insert_to_mysql,
     get_novel_id_list_from_db,
     reset_novels_table,
@@ -21,7 +21,7 @@ progress = FrameProgress(
 )
 
 
-class BiqvgenPipeline:
+class GetListPipeline:
     novel_list = []  # 小说列表
     abnormal_list = []  # 异常id
     remote_list = []
@@ -32,8 +32,9 @@ class BiqvgenPipeline:
     def process_item(self, item, spider):
         if self.task_id is None:
             progress.start()
-            progress.update(self.task_id, advance=1)
-            self.task_id = progress.add_task("正在爬取小说详情", start=False)
+            self.task_id = progress.add_task(
+                "正在爬取小说详情", start=False, completed=1
+            )
         else:
             progress.start()
             progress.update(self.task_id, advance=1)
@@ -72,3 +73,18 @@ class BiqvgenPipeline:
         self.abnormal_list.clear()
 
         console.log("爬取结束")
+
+
+class GetChapterPipeline:
+    #  处理item
+    def process_item(self, item, spider):
+        console.log("🚀 ~ item:", item)
+        pass
+
+    # 开启爬虫
+    def open_spider(self, spider):
+        pass
+
+    # 关闭爬虫
+    def close_spider(self, spider):
+        pass

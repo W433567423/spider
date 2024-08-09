@@ -79,6 +79,7 @@ class GetChapterPipeline:
     #  处理item
     def process_item(self, item, spider):
         console.log("🚀 ~ item:", item)
+        item["content"] = item["content"].replace("\xa0", "")
         pass
 
     # 开启爬虫

@@ -45,15 +45,13 @@ class GetChapterSpider(scrapy.Spider):
         novel_id = response.meta["novel_id"]
         last9 = response.css("ul.last9").getall()
         chapter_node_list = scrapy.Selector(text=last9.pop()).css("li a").getall()
-        console.log("🚀 ~ chapter_node_list:", chapter_node_list)
-        for chapter in chapter_node_list[:10]:
+        for chapter in chapter_node_list[:1]:
             chapter_id = re.search(r'href="(.*?).html"', chapter).group(1)
             chapter_name = re.search(r">(.*?)</a>", chapter).group(1)
             item = GetChapterItem(
                 novel_id=novel_id, chapter_id=chapter_id, chapter_name=chapter_name
             )
             url = f"{self.base_url}/book/{novel_id}/{chapter_id}.html"
-            console.log("🚀 ~ url:", url)
             yield scrapy.Request(
                 url,
                 callback=self.parse_content,
@@ -69,9 +67,10 @@ class GetChapterSpider(scrapy.Spider):
 
     # 获取小说内容
     def parse_content(self, response):
-        console.log("🚀 ~ response:", response.url)
+        chapter_content = ""
         item = response.meta["item"]
-        content = response.css("div#nr1::text").get()
-        console.log("🚀 ~ content:", content)
-        # item["content"] = content
-        # yield item
+        contents = response.css("div#nr1 *::text").getall()
+        for content in contents:
+            chapter_content += f"{content}\n"
+        item["chapter_content"] = chapter_content
+        yield item

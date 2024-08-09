@@ -17,7 +17,7 @@ class GetListItem(scrapy.Item):
 
 class GetChapterItem(scrapy.Item):
     novel_id = scrapy.Field()  # 小说id
+    novel_name = scrapy.Field()  # 小说名
     chapter_id = scrapy.Field()  # 章节id
     chapter_name = scrapy.Field()  # 章节名
     chapter_content = scrapy.Field()  # 章节内容
-    abnormal = scrapy.Field()  # 是否异常

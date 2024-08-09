@@ -1,5 +1,5 @@
 import os
-from biqugen.db import reset_novels_table
+from biqugen.db import reset_novels_table, reset_chapters_table
 
 # 创建log文件夹
 if not os.path.exists("log"):
@@ -11,3 +11,4 @@ else:
 
 # 重置数据库
 # reset_novels_table()
+# reset_chapters_table()

@@ -26,7 +26,7 @@ def get_not_crawled_novel_Count():
     return novel_num
 
 
-novel_num = 1024
+novel_num = 8192
 
 
 class FrameProgress(Progress):

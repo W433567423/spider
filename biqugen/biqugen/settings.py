@@ -10,15 +10,15 @@ ITEM_PIPELINES = {
 }
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
-CONCURRENT_REQUESTS = 16
-CONCURRENT_REQUESTS_PER_DOMAIN = 16
+CONCURRENT_REQUESTS = 128
+CONCURRENT_REQUESTS_PER_DOMAIN = 128
 
 # 日志设置
-FEED_EXPORT_ENCODING = "gbk"
+FEED_EXPORT_ENCODING = "utf-8"
 LOG_LEVEL = "WARNING"  # 仅显示警告信息
 to_day = datetime.datetime.now()
 # log_file_path = "log/scrapy_{}_{}_{} {}_{}.log".format(
 #     to_day.year, to_day.month, to_day.day, to_day.hour, to_day.minute
 # )
-log_file_path = "log/chapter_{}_{}_{}.log".format(to_day.year, to_day.month, to_day.day)
+log_file_path = "log/spider_{}_{}_{}.log".format(to_day.year, to_day.month, to_day.day)
 LOG_FILE = log_file_path

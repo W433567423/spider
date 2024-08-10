@@ -82,8 +82,8 @@ class GetChapterPipeline:
         BarColumn(),
         "[progress.percentage]{task.percentage:>3.2f}%",
         TextColumn('{task.completed}/{task.total}'),
-        "[cyan]⏳",
-        TimeRemainingColumn()
+        # "[cyan]⏳",
+        # TimeRemainingColumn()
         )
 
     main_task= chapter_progress.add_task(
@@ -101,7 +101,7 @@ class GetChapterPipeline:
         if index==-1:
             self.chapter_progress.start()
             task_id= self.chapter_progress.add_task(
-                f"爬取小说《{item["novel_name"]}》".ljust(24), completed=1
+                f"爬取小说《{item["novel_name"]}》".ljust(21), completed=1
             )
             task={"novel_id":item["novel_id"],"task_id":task_id,"chapter_list":[item],"total_chapter":item["total_chapter"]}
             self.chapter_tasks.append(task)

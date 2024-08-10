@@ -25,7 +25,7 @@ class GetChapterSpider(scrapy.Spider):
         #  获取小说目录page
         mulu_node = response.css("div.lb_mulu div.input-group").get()
         if not mulu_node:
-            logging.warning(f"{novel_id} 仅一页目录:{response.url}")
+            # logging.warning(f"{novel_id} 仅一页目录:{response.url}")
             return
         mulu_page = (
             int(

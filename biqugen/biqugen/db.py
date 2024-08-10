@@ -9,7 +9,7 @@ def reset_novels_table():
     conn.ping(reconnect=True)
     cursor = conn.cursor()
     # 先尝试删除 chapters表
-    reset_chapters_table()
+    cursor.execute("DROP TABLE IF EXISTS chapters;")
     # cursor.execute("CREATE DATABASE novel_database IF NOT EXISTS novel_database;")
     cursor.execute("DROP TABLE IF EXISTS novels;")
     cursor.execute(
@@ -25,6 +25,18 @@ def reset_novels_table():
             intro TEXT COMMENT '小说简介',
             is_chapter BOOLEAN DEFAULT FALSE COMMENT '是否已爬取章节',
             abnormal BOOLEAN DEFAULT FALSE COMMENT '是否异常'
+            );
+        """
+    )
+    cursor.execute(
+        """
+            CREATE TABLE IF NOT EXISTS chapters(
+            chapter_id INT PRIMARY KEY COMMENT '笔趣阁章节id',
+            novel_id INT COMMENT '小说id',
+            novel_name VARCHAR(255) COMMENT '小说名',
+            chapter_name VARCHAR(255) COMMENT '章节名',
+            chapter_order INT COMMENT '章节顺序',
+            chapter_content LONGTEXT COMMENT '章节内容'
             );
         """
     )

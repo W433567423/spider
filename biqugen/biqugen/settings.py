@@ -5,8 +5,8 @@ SPIDER_MODULES = ["biqugen.spiders"]
 NEWSPIDER_MODULE = "biqugen.spiders"
 ROBOTSTXT_OBEY = False  # 不遵守robots协议
 ITEM_PIPELINES = {
-    # "biqugen.pipelines.GetListPipeline": 300,
-    "biqugen.pipelines.GetChapterPipeline": 300,
+    "biqugen.pipelines.GetListPipeline": 300,
+    # "biqugen.pipelines.GetChapterPipeline": 300,
 }
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
